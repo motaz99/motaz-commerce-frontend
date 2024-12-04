@@ -1,3 +1,5 @@
+import Logout from "../components/Logout";
+
 export default function Home() {
     const products = [
       {
@@ -58,6 +60,7 @@ export default function Home() {
             ))}
           </tbody>
         </table>
+        <Logout />
       </div>
     );
   }

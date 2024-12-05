@@ -26,12 +26,30 @@ export async function POST(request) {
       startDate,
       endDate,
       gender,
+      role,
+      phoneNumber,
       dateOfBirth,
-      passportNumber,
-      residencyCardNumber,
-      idCardNumber,
+      sindibadId,
       leaveBalance,
     } = await request.json();
+
+    if (
+      !firstName ||
+      !lastName ||
+      !startDate ||
+      !gender ||
+      !role ||
+      !phoneNumber ||
+      !dateOfBirth ||
+      !sindibadId
+    ) {
+      return NextResponse.json(
+        {
+          error: "All required fields, including sindibadId, must be provided.",
+        },
+        { status: 400 }
+      );
+    }
 
     const newEmployee = await prisma.employees.create({
       data: {
@@ -42,17 +60,26 @@ export async function POST(request) {
         startDate: new Date(startDate),
         endDate: endDate ? new Date(endDate) : null,
         gender,
+        role,
+        phoneNumber,
         dateOfBirth: new Date(dateOfBirth),
-        passportNumber,
-        residencyCardNumber,
-        idCardNumber,
+        sindibadId,
         leaveBalance: leaveBalance || 0,
       },
     });
 
     return NextResponse.json(newEmployee, { status: 201 });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating employee:", error);
+
+    // Handle unique constraint violation for sindibadId
+    if (error.code === "P2002" && error.meta?.target.includes("sindibadId")) {
+      return NextResponse.json(
+        { error: "Sindibad ID already exists. Please provide a unique ID." },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -17,19 +17,19 @@ model Users {
 }
 
 model Employees {
-  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
-  firstName           String
-  middleName          String?
-  lastName            String
-  familyName          String?
-  startDate           DateTime
-  endDate             DateTime?
-  gender              String
-  dateOfBirth         DateTime
-  passportNumber      String?   @unique
-  residencyCardNumber String?   @unique
-  idCardNumber        String?   @unique
-  leaveBalance        Int       @default(0)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  middleName   String?
+  lastName     String
+  familyName   String?
+  startDate    DateTime
+  endDate      DateTime?
+  gender       String
+  role         String
+  phoneNumber  Int
+  dateOfBirth  DateTime
+  sindibadId   String?   @unique
+  leaveBalance Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

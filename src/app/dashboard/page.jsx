@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Logout from '../components/Logout';
-import HandleDeleteEmployee from '../models/handleDeleteEmployee';
+import EmployeeDeleteModal from '../models/EmployeeDeleteModal';
 import EmployeeDetailsModal from '../models/EmployeeDetailsModal';
 
 export default function EmployeeList() {
@@ -142,7 +142,7 @@ export default function EmployeeList() {
         </table>
       </div>
       {showDeleteModal && (
-        <HandleDeleteEmployee
+        <EmployeeDeleteModal
           employee={employeeToDelete}
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}

@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import Logout from '../components/Logout';
 import HandleDeleteEmployee from '../models/handleDeleteEmployee';
+import EmployeeDetailsModal from '../models/EmployeeDetailsModal';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [employeeToView, setEmployeeToView] = useState(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -44,6 +47,16 @@ export default function EmployeeList() {
   const handleCancelDelete = () => {
     setEmployeeToDelete(null);
     setShowDeleteModal(false);
+  };
+
+  const handleOpenDetailsModal = (employee) => {
+    setEmployeeToView(employee);
+    setShowDetailsModal(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setEmployeeToView(null);
+    setShowDetailsModal(false);
   };
 
   if (loading) {
@@ -110,8 +123,12 @@ export default function EmployeeList() {
                 </td>
                 <td className="px-6 py-4">{employee.role}</td>
                 <td className="px-6 py-4 flex space-x-4">
-                  <button className="text-blue-500 hover:underline">View</button>
-                  <button className="text-green-500 hover:underline">Edit</button>
+                  <button
+                    onClick={() => handleOpenDetailsModal(employee)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    View
+                  </button>
                   <button
                     onClick={() => handleOpenDeleteModal(employee)}
                     className="text-red-500 hover:underline"
@@ -129,6 +146,12 @@ export default function EmployeeList() {
           employee={employeeToDelete}
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
+        />
+      )}
+      {showDetailsModal && (
+        <EmployeeDetailsModal
+          employee={employeeToView}
+          onClose={handleCloseDetailsModal}
         />
       )}
       <Logout />

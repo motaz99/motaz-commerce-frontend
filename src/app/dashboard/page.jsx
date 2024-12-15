@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import HandleDeleteEmployee from '../models/handleDeleteEmployee';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -18,7 +20,6 @@ export default function EmployeeList() {
 
         const data = await res.json();
         setEmployees(data);
-        setFilteredEmployees(data);
       } catch (error) {
         console.error('Error fetching employees:', error);
       } finally {
@@ -29,6 +30,20 @@ export default function EmployeeList() {
     fetchEmployees();
   }, []);
 
+  const handleOpenDeleteModal = (employee) => {
+    setEmployeeToDelete(employee);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = (employeeId) => {
+    setEmployees(employees.filter((emp) => emp.id !== employeeId));
+    setShowDeleteModal(false);
+  };
+
+  const handleCancelDelete = () => {
+    setEmployeeToDelete(null);
+    setShowDeleteModal(false);
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -69,7 +84,7 @@ export default function EmployeeList() {
             </tr>
           </thead>
           <tbody>
-            {filteredEmployees.map((employee, index) => (
+            {employees.map((employee, index) => (
               <tr
                 key={employee.id}
                 className="bg-white border-b hover:bg-gray-100"
@@ -96,13 +111,25 @@ export default function EmployeeList() {
                 <td className="px-6 py-4 flex space-x-4">
                   <button className="text-blue-500 hover:underline">View</button>
                   <button className="text-green-500 hover:underline">Edit</button>
-                  <button className="text-red-500 hover:underline">Delete</button>
+                  <button
+                    onClick={() => handleOpenDeleteModal(employee)}
+                    className="text-red-500 hover:underline"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {showDeleteModal && (
+        <HandleDeleteEmployee
+          employee={employeeToDelete}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
     </div>
   );
 }

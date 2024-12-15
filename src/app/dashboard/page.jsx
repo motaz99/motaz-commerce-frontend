@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Logout from '../components/Logout';
 import HandleDeleteEmployee from '../models/handleDeleteEmployee';
 
 export default function EmployeeList() {
@@ -130,6 +131,7 @@ export default function EmployeeList() {
           onCancel={handleCancelDelete}
         />
       )}
+      <Logout />
     </div>
   );
 }

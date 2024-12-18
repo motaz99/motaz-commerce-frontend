@@ -26,7 +26,7 @@ model Employees {
   endDate      DateTime?
   gender       String
   role         String
-  phoneNumber  Int
+  phoneNumber  String
   dateOfBirth  DateTime
   sindibadId   String?   @unique
   leaveBalance Int       @default(0)

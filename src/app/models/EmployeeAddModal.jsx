@@ -1,37 +1,29 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { employeeSchema } from "../../schemas/employeeSchema";
+
 
 export default function EmployeeAddModal({ onClose, onAdd }) {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    familyName: "",
-    startDate: "",
-    endDate: "",
-    gender: "",
-    role: "",
-    phoneNumber: "",
-    dateOfBirth: "",
-    sindibadId: "",
-    leaveBalance: 0,
+  const [error, setError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
+    resolver: yupResolver(employeeSchema),
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async () => {
-    setLoading(true);
+  const onSubmit = async (data) => {
     try {
       const payload = {
-        ...formData,
-        phoneNumber: parseInt(formData.phoneNumber, 10),
-        leaveBalance: parseInt(formData.leaveBalance, 10),
-        startDate: new Date(formData.startDate).toISOString(),
-        dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
-        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+        ...data,
+        startDate: new Date(data.startDate).toISOString(),
+        dateOfBirth: new Date(data.dateOfBirth).toISOString(),
+        endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
+        leaveBalance: parseInt(data.leaveBalance, 10),
       };
 
       const res = await fetch("/api/employees", {
@@ -40,14 +32,17 @@ export default function EmployeeAddModal({ onClose, onAdd }) {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to create employee");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create employee");
+      }
 
       const newEmployee = await res.json();
       onAdd(newEmployee);
+      reset();
     } catch (error) {
-      console.error("Error adding employee:", error);
-    } finally {
-      setLoading(false);
+        setError(error.message)
+        console.error("Error adding employee:", error);
     }
   };
 
@@ -57,26 +52,23 @@ export default function EmployeeAddModal({ onClose, onAdd }) {
         <h2 className="text-2xl font-bold mb-4 text-black text-center">
           Add New Employee
         </h2>
-        <form className="grid grid-cols-2 gap-4">
-          {/* First Column */}
+         {error && (
+          <p className="text-red-600 text-sm mb-4">{error}</p> 
+        )}
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-black">First Name</label>
             <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
+              {...register("firstName")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.firstName?.message}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black">Middle Name</label>
             <input
-              type="text"
-              name="middleName"
-              value={formData.middleName}
-              onChange={handleInputChange}
+              {...register("middleName")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
           </div>
@@ -84,21 +76,16 @@ export default function EmployeeAddModal({ onClose, onAdd }) {
           <div>
             <label className="block text-sm font-medium text-black">Last Name</label>
             <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
+              {...register("lastName")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.lastName?.message}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black">Family Name</label>
             <input
-              type="text"
-              name="familyName"
-              value={formData.familyName}
-              onChange={handleInputChange}
+              {...register("familyName")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
           </div>
@@ -107,79 +94,75 @@ export default function EmployeeAddModal({ onClose, onAdd }) {
             <label className="block text-sm font-medium text-black">Date of Birth</label>
             <input
               type="date"
-              name="dateOfBirth"
-              value={formData.dateOfBirth}
-              onChange={handleInputChange}
+              {...register("dateOfBirth")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.dateOfBirth?.message}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black">Gender</label>
             <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleInputChange}
+              {...register("gender")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
+            <p className="text-red-500 text-sm">{errors.gender?.message}</p>
           </div>
 
           {/* Second Column */}
           <div>
-            <label className="block text-sm font-medium text-black">Phone Number</label>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
-            />
-          </div>
+                <label className="block text-sm font-medium text-black">Phone Number</label>
+                <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-md border border-gray-300 bg-gray-100 text-gray-800">
+                    +964
+                    </span>
+                    <input
+                    {...register("phoneNumber")}
+                    maxLength="10"
+                    placeholder="7710134234"
+                    className="mt-1 block w-full border-gray-300 rounded-r-md shadow-sm focus:ring focus:ring-blue-300 text-black"
+                    />
+                </div>
+                <p className="text-red-500 text-sm">{errors.phoneNumber?.message}</p>
+            </div>
 
           <div>
             <label className="block text-sm font-medium text-black">Role</label>
             <input
-              type="text"
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
+              {...register("role")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.role?.message}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black">Sindibad ID</label>
             <input
-              type="text"
-              name="sindibadId"
-              value={formData.sindibadId}
-              onChange={handleInputChange}
+              {...register("sindibadId")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.sindibadId?.message}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black">Start Date</label>
             <input
               type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleInputChange}
+              {...register("startDate")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.startDate?.message}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-black">End Date</label>
             <input
               type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleInputChange}
+              {...register("endDate", { required: false, shouldUnregister: true })}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
           </div>
@@ -188,11 +171,10 @@ export default function EmployeeAddModal({ onClose, onAdd }) {
             <label className="block text-sm font-medium text-black">Leave Balance</label>
             <input
               type="number"
-              name="leaveBalance"
-              value={formData.leaveBalance}
-              onChange={handleInputChange}
+              {...register("leaveBalance")}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
+            <p className="text-red-500 text-sm">{errors.leaveBalance?.message}</p>
           </div>
         </form>
 
@@ -200,16 +182,17 @@ export default function EmployeeAddModal({ onClose, onAdd }) {
           <button
             onClick={onClose}
             className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-            disabled={loading}
+            disabled={isSubmitting}
           >
             Close
           </button>
           <button
-            onClick={handleSave}
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-            disabled={loading}
+            disabled={isSubmitting}
           >
-            {loading ? "Saving..." : "Add Employee"}
+            {isSubmitting ? "Saving..." : "Add Employee"}
           </button>
         </div>
       </div>

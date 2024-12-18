@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Logout from '../components/Logout';
 import EmployeeDeleteModal from '../models/EmployeeDeleteModal';
 import EmployeeDetailsModal from '../models/EmployeeDetailsModal';
+import EmployeeAddModal from '../models/EmployeeAddModal';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -12,6 +13,7 @@ export default function EmployeeList() {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [employeeToView, setEmployeeToView] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false); // NEW STATE
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -59,6 +61,19 @@ export default function EmployeeList() {
     setShowDetailsModal(false);
   };
 
+  const handleOpenAddModal = () => {
+    setShowAddModal(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+  };
+
+  const handleAddEmployee = (newEmployee) => {
+    setEmployees((prevEmployees) => [...prevEmployees, newEmployee]);
+    setShowAddModal(false);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -67,42 +82,35 @@ export default function EmployeeList() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Employee List</h1>
-        <input
-          type="text"
-          placeholder="Search..."
-          className="w-64 px-3 py-2 text-black border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <div className="flex space-x-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-64 px-3 py-2 text-black border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+          />
+          <button
+            onClick={handleOpenAddModal}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            Add Employee
+          </button>
+        </div>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3">
-                #
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Name
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Sindibad ID
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Join Date
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Role
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Action
-              </th>
+              <th scope="col" className="px-6 py-3">#</th>
+              <th scope="col" className="px-6 py-3">Name</th>
+              <th scope="col" className="px-6 py-3">Sindibad ID</th>
+              <th scope="col" className="px-6 py-3">Join Date</th>
+              <th scope="col" className="px-6 py-3">Role</th>
+              <th scope="col" className="px-6 py-3">Action</th>
             </tr>
           </thead>
           <tbody>
             {employees.map((employee, index) => (
-              <tr
-                key={employee.id}
-                className="bg-white border-b hover:bg-gray-100"
-              >
+              <tr key={employee.id} className="bg-white border-b hover:bg-gray-100">
                 <td className="px-6 py-4">{index + 1}</td>
                 <td className="px-6 py-4 flex items-center">
                   <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
@@ -118,9 +126,7 @@ export default function EmployeeList() {
                   </span>
                 </td>
                 <td className="px-6 py-4">{employee.sindibadId || 'N/A'}</td>
-                <td className="px-6 py-4">
-                  {new Date(employee.startDate).toLocaleDateString()}
-                </td>
+                <td className="px-6 py-4">{new Date(employee.startDate).toLocaleDateString()}</td>
                 <td className="px-6 py-4">{employee.role}</td>
                 <td className="px-6 py-4 flex space-x-4">
                   <button
@@ -153,6 +159,9 @@ export default function EmployeeList() {
           employee={employeeToView}
           onClose={handleCloseDetailsModal}
         />
+      )}
+      {showAddModal && (
+        <EmployeeAddModal onClose={handleCloseAddModal} onAdd={handleAddEmployee} />
       )}
       <Logout />
     </div>

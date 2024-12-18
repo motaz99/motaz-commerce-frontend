@@ -15,3 +15,21 @@ model Users {
   role      String
   createdAt DateTime @default(now())
 }
+
+model Employees {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  middleName   String?
+  lastName     String
+  familyName   String?
+  startDate    DateTime
+  endDate      DateTime?
+  gender       String
+  role         String
+  phoneNumber  Int
+  dateOfBirth  DateTime
+  sindibadId   String?   @unique
+  leaveBalance Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

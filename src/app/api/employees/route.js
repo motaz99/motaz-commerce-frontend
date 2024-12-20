@@ -5,7 +5,11 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const employees = await prisma.employees.findMany();
+    const employees = await prisma.employees.findMany({
+      where: {
+        isActive: true,
+      },
+    });
     return NextResponse.json(employees, { status: 200 });
   } catch (error) {
     console.error("Error fetching employees:", error);

@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 export async function GET(request, { params }) {
   const { id } = params;
-  console.log(id);
 
   try {
     const employee = await prisma.employees.findUnique({

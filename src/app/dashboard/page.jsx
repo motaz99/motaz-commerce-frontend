@@ -5,6 +5,7 @@ import Logout from '../components/Logout';
 import EmployeeDeleteModal from '../models/EmployeeDeleteModal';
 import EmployeeDetailsModal from '../models/EmployeeDetailsModal';
 import EmployeeAddModal from '../models/EmployeeAddModal';
+import EmployeeArchiveToggleModal from '../models/EmployeeArchiveToggleModal';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -13,7 +14,9 @@ export default function EmployeeList() {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [employeeToView, setEmployeeToView] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false); // NEW STATE
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [employeeToArchive, setEmployeeToArchive] = useState(null);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -72,6 +75,22 @@ export default function EmployeeList() {
   const handleAddEmployee = (newEmployee) => {
     setEmployees((prevEmployees) => [...prevEmployees, newEmployee]);
     setShowAddModal(false);
+  };
+
+  const handleOpenArchiveModal = (employee) => {
+    setEmployeeToArchive(employee);
+    setShowArchiveModal(true);
+  };
+
+  const handleConfirmArchive = (employeeId, newStatus) => {
+    setEmployees(employees.filter((emp) => emp.id !== employeeId)
+    );
+    setShowArchiveModal(false);
+  };
+
+  const handleCancelArchive = () => {
+    setEmployeeToArchive(null);
+    setShowArchiveModal(false);
   };
 
   if (loading) {
@@ -141,6 +160,12 @@ export default function EmployeeList() {
                   >
                     Delete
                   </button>
+                  <button
+                    onClick={() => handleOpenArchiveModal(employee)}
+                    className="text-yellow-500 hover:underline"
+                  >
+                    {employee.isActive ? 'Archive' : 'Unarchive'}
+                  </button>
                 </td>
               </tr>
             ))}
@@ -162,6 +187,13 @@ export default function EmployeeList() {
       )}
       {showAddModal && (
         <EmployeeAddModal onClose={handleCloseAddModal} onAdd={handleAddEmployee} />
+      )}
+      {showArchiveModal && (
+        <EmployeeArchiveToggleModal
+          employee={employeeToArchive}
+          onConfirm={handleConfirmArchive}
+          onCancel={handleCancelArchive}
+        />
       )}
       <Logout />
     </div>

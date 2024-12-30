@@ -1,7 +1,17 @@
 import Link from 'next/link';
 import { AiOutlineHome, AiOutlineTeam, AiOutlineFolderOpen, AiOutlineUser } from 'react-icons/ai';
+import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  const links = [
+    { href: '/dashboard', label: 'Dashboard', icon: AiOutlineHome },
+    { href: '/employees', label: 'Employees', icon: AiOutlineTeam },
+    { href: '/archived-employees', label: 'Archived Employees', icon: AiOutlineFolderOpen },
+    { href: '/users', label: 'Users', icon: AiOutlineUser },
+  ];
+
   return (
     <aside
       id="default-sidebar"
@@ -10,42 +20,21 @@ export default function Sidebar() {
     >
       <div className="h-full px-3 py-4 overflow-y-auto">
         <ul className="space-y-2 font-medium">
-          <li>
-            <Link
-              href="/dashboard"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
-              <AiOutlineHome className="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-              <span className="ml-3">Dashboard</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/employees"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
-              <AiOutlineTeam className="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-              <span className="ml-3">Employees</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/archived-employees"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
-              <AiOutlineFolderOpen className="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-              <span className="ml-3">Archived Employees</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/users"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
-              <AiOutlineUser className="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-              <span className="ml-3">Users</span>
-            </Link>
-          </li>
+          {links.map(({ href, label, icon: Icon }) => (
+            <li key={href}>
+              <Link
+                href={href}
+                className={`flex items-center p-3 rounded-lg transition-all ${
+                  pathname.startsWith(href)
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-900 dark:text-white hover:bg-gray-100 hover:text-blue-500 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Icon className="w-6 h-6 mr-3" />
+                {label}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </aside>

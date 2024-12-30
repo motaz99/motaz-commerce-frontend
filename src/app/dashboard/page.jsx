@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
 import Logout from '../components/Logout';
 import EmployeeDeleteModal from '../models/EmployeeDeleteModal';
 import EmployeeDetailsModal from '../models/EmployeeDetailsModal';
@@ -18,10 +19,17 @@ export default function EmployeeList() {
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [employeeToArchive, setEmployeeToArchive] = useState(null);
 
+  const router = useRouter();
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const res = await fetch('/api/employees', { method: 'GET' });
+
+        if (res.status === 401 || res.status === 403) {
+          router.push("/login");
+          return;
+        }
 
         if (!res.ok) {
           throw new Error('Failed to fetch employees');

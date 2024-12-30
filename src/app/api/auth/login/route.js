@@ -35,7 +35,7 @@ export async function POST(request) {
       );
     }
 
-    const token = generateToken(user);
+    const token = await generateToken(user);
 
     const response = NextResponse.json({
       message: "Login successful",

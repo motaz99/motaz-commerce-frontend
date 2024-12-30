@@ -1,39 +1,42 @@
-import Link from 'next/link'
-import { FiPieChart, FiGrid, FiShoppingCart, FiBarChart } from 'react-icons/fi'
+import Link from 'next/link';
+import { AiOutlineHome, AiOutlineTeam, AiOutlineFolderOpen, AiOutlineUser } from 'react-icons/ai';
+import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  const links = [
+    { href: '/dashboard', label: 'Dashboard', icon: AiOutlineHome },
+    { href: '/employees', label: 'Employees', icon: AiOutlineTeam },
+    { href: '/archived-employees', label: 'Archived Employees', icon: AiOutlineFolderOpen },
+    { href: '/users', label: 'Users', icon: AiOutlineUser },
+  ];
+
   return (
-    <>
-      <aside id="default-sidebar" className="fixed top-0 left-0 z-40 w-64 h-screen bg-gray-50 dark:bg-gray-800" aria-label="Sidebar">
-        <div className="h-full px-3 py-4 overflow-y-auto">
-          <ul className="space-y-2 font-medium">
-            <li>
-              <Link href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                <FiPieChart className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ml-3">Dashboard</span>
+    <aside
+      id="default-sidebar"
+      className="fixed top-0 left-0 z-40 w-64 h-screen bg-gray-50 dark:bg-gray-800"
+      aria-label="Sidebar"
+    >
+      <div className="h-full px-3 py-4 overflow-y-auto">
+        <ul className="space-y-2 font-medium">
+          {links.map(({ href, label, icon: Icon }) => (
+            <li key={href}>
+              <Link
+                href={href}
+                className={`flex items-center p-3 rounded-lg transition-all ${
+                  pathname.startsWith(href)
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-900 dark:text-white hover:bg-gray-100 hover:text-blue-500 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Icon className="w-6 h-6 mr-3" />
+                {label}
               </Link>
             </li>
-            <li>
-              <Link href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                <FiGrid className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ml-3">Orders</span>
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                <FiShoppingCart className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ml-3">Products</span>
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                <FiBarChart className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                <span className="ml-3">Analytics</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </aside>
-    </>
-  )
+          ))}
+        </ul>
+      </div>
+    </aside>
+  );
 }

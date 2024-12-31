@@ -8,7 +8,7 @@ export default function Sidebar() {
   const links = [
     { href: '/dashboard', label: 'Dashboard', icon: AiOutlineHome },
     { href: '/employees', label: 'Employees', icon: AiOutlineTeam },
-    { href: '/archived-employees', label: 'Archived Employees', icon: AiOutlineFolderOpen },
+    { href: '/employees/archived-employees', label: 'Archived Employees', icon: AiOutlineFolderOpen },
     { href: '/employees/users', label: 'Users', icon: AiOutlineUser },
   ];
 

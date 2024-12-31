@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
-import Logout from '../../components/Logout';
 import EmployeeDeleteModal from '../../models/EmployeeDeleteModal';
 import EmployeeDetailsModal from '../../models/EmployeeDetailsModal';
 import EmployeeArchiveToggleModal from '../../models/EmployeeArchiveToggleModal';
@@ -180,7 +179,6 @@ export default function ArchivedEmployees() {
           onCancel={handleCancelArchive}
         />
       )}
-      <Logout />
     </div>
   );
 }

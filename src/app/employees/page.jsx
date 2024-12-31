@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
-import Logout from '../components/Logout';
 import EmployeeDeleteModal from '../models/EmployeeDeleteModal';
 import EmployeeDetailsModal from '../models/EmployeeDetailsModal';
 import EmployeeAddModal from '../models/EmployeeAddModal';
@@ -203,7 +202,6 @@ export default function Employees() {
           onCancel={handleCancelArchive}
         />
       )}
-      <Logout />
     </div>
   );
 }

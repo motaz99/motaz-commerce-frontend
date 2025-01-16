@@ -33,4 +33,14 @@ model Employees {
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  account      Accounts? @relation("EmployeeAccount")
+}
+
+model Accounts {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  email      String    @unique
+  password   String
+  createdAt  DateTime  @default(now())
+  employeeId String    @unique @db.ObjectId
+  employee   Employees @relation("EmployeeAccount", fields: [employeeId], references: [id])
 }

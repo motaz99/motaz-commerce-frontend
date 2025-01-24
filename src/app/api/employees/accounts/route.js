@@ -4,6 +4,29 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
+export async function GET() {
+  try {
+    const accounts = await prisma.accounts.findMany({
+      include: {
+        employee: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(accounts, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching accounts:", error);
+    return NextResponse.json(
+      { error: "Internal server error." },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request) {
   try {
     const { employeeId, email, password } = await request.json();
@@ -77,12 +100,16 @@ export async function PUT(request) {
         { status: 400 }
       );
     }
+    const hashedPassword = await bcrypt.hash(
+      password,
+      parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10
+    );
 
     const updatedAccount = await prisma.accounts.update({
       where: { id: accountId },
       data: {
         email,
-        password,
+        password: hashedPassword,
       },
     });
 

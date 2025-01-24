@@ -10,6 +10,11 @@ async function verifyUser(request) {
 
   try {
     const decoded = await decodeToken(token);
+
+    if (decoded.role !== "admin") {
+      return { error: "Forbidden: Admins only", status: 403 };
+    }
+
     return { decoded, error: null };
   } catch (error) {
     console.error("Error in verifyUser:", error.name, error.message);

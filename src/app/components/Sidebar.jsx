@@ -10,7 +10,7 @@ export default function Sidebar() {
     { href: '/dashboard', label: 'Dashboard', icon: AiOutlineHome },
     { href: '/employees', label: 'Employees', icon: AiOutlineTeam },
     { href: '/employees/archived-employees', label: 'Archived Employees', icon: AiOutlineFolderOpen },
-    { href: '/employees/users', label: 'Users', icon: AiOutlineUser },
+    { href: '/employees/accounts', label: 'Accounts', icon: AiOutlineUser },
   ];
 
   return (

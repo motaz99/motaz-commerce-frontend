@@ -1,41 +1,66 @@
-'use client';
-
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { accountSchema } from '../../schemas/accountSchema';
+import { useState } from "react";
+import AsyncSelect from "react-select/async";
 
 export default function AccountAddModal({ onClose, onAdd }) {
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm({
-    resolver: yupResolver(accountSchema),
-  });
-
-  const onSubmit = async (data) => {
+  const loadOptions = async (inputValue) => {
+    if (!inputValue) return []; 
     try {
-      const res = await fetch('/api/employees/accounts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      const res = await fetch(`/api/employees?search=${inputValue}`);
+      if (!res.ok) throw new Error("Failed to fetch employees");
+
+      const data = await res.json();
+      return data.map((employee) => ({
+        value: employee.id,
+        label: `${employee.firstName} ${employee.lastName}`,
+      }));
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      return [];
+    }
+  };
+
+  const handleEmployeeChange = (option) => {
+    if (option) {
+      setSelectedEmployee({ id: option.value, name: option.label });
+    } else {
+      setSelectedEmployee(null);
+    }
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault(); 
+
+
+    if (!selectedEmployee) {
+      setError("Please select an employee");
+      return;
+    }
+
+    try {
+      const body = {
+        employeeId: selectedEmployee.id,
+        email: e.target.email.value,
+        password: e.target.password.value,
+      };
+
+
+      const res = await fetch("/api/employees/accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to create account');
-      }
+      if (!res.ok) throw new Error("Failed to create account");
 
       const newAccount = await res.json();
       onAdd(newAccount);
-      reset();
+      onClose();
     } catch (error) {
       setError(error.message);
-      console.error('Error adding account:', error);
+      console.error("Error adding account:", error);
     }
   };
 
@@ -46,52 +71,48 @@ export default function AccountAddModal({ onClose, onAdd }) {
           Add New Account
         </h2>
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4">
+        <form className="grid grid-cols-1 gap-4" onSubmit={onSubmit}>
           <div>
-            <label className="block text-sm font-medium text-black">Employee ID</label>
-            <input
-              {...register('employeeId')}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
+            <label className="block text-sm font-medium text-black">Employee</label>
+            <AsyncSelect
+              loadOptions={loadOptions}
+              onChange={handleEmployeeChange}
+              placeholder="Search for employee..."
+              isClearable
             />
-            <p className="text-red-500 text-sm">{errors.employeeId?.message}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-black">Email</label>
             <input
               type="email"
-              {...register('email')}
+              name="email"
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
-            <p className="text-red-500 text-sm">{errors.email?.message}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-black">Password</label>
             <input
               type="password"
-              {...register('password')}
+              name="password"
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 text-black"
             />
-            <p className="text-red-500 text-sm">{errors.password?.message}</p>
+          </div>
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+            >
+              Close
+            </button>
+            <button
+              type="submit" // Ensure this is a submit button
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            >
+              Add Account
+            </button>
           </div>
         </form>
-
-        <div className="mt-6 flex justify-between">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-            disabled={isSubmitting}
-          >
-            Close
-          </button>
-          <button
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Saving...' : 'Add Account'}
-          </button>
-        </div>
       </div>
     </div>
   );

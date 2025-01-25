@@ -3,13 +3,28 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request) {
+  const { search } = request.nextUrl.searchParams;
+
   try {
     const employees = await prisma.employees.findMany({
       where: {
         isActive: true,
+        OR: search
+          ? [
+              { firstName: { contains: search, mode: "insensitive" } },
+              { lastName: { contains: search, mode: "insensitive" } },
+              { middleName: { contains: search, mode: "insensitive" } },
+            ]
+          : undefined,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
       },
     });
+
     return NextResponse.json(employees, { status: 200 });
   } catch (error) {
     console.error("Error fetching employees:", error);
